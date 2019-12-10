@@ -5,7 +5,7 @@ app.use(bodyParser.urlencoded({ extended: true }));
 app.use(bodyParser.json());
 require ('dotenv/config')
 const { Pool } = require('pg')
-const server = app.listen(PORT = process.env.port || 8000, () => {console.log(`listening on ${PORT}`)})
+const server = app.listen(PORT = process.env.port || 5000, () => {console.log(`listening on ${PORT}`)})
 const io = require('socket.io').listen(server)
 
 const { login } = require('./apis/login')
