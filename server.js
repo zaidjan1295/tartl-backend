@@ -27,9 +27,9 @@ const pool = mysql.createPool({
 
 let activeConnections = {}
 
-const isNotNew = (auid, action) => {
-    console.log("auid", auid)
-    if(!auid){
+const isNotNew = (auid, action, obj) => {
+    console.log("auid", auid, "hasProperty", activeConnections.hasOwnProperty(auid))
+    if(auid){
         if(activeConnections.hasOwnProperty(auid)){
             activeConnections[auid].emit(action, obj)
             console.log("notification sent")
@@ -47,8 +47,9 @@ io.on('connection', (client) =>{
         console.log("edit appintment", sql)
         pool.query(sql, (err, result) => {
             if(err) throw err
-            client.emit('editAppointment', {error: 0, subject: data.subject, aWhen: data.aWhen, aWith: data.aWith, aid: data.aid})
-            isNotNew(data.auid, 'editAppointment')
+            const obj = {error: 0, subject: data.subject, aWhen: data.aWhen, aWith: data.aWith, aid: data.aid}
+            client.emit('editAppointment', obj )
+            isNotNew(data.auid, 'editAppointment', obj)
         })   
     });
 
@@ -57,10 +58,10 @@ io.on('connection', (client) =>{
         console.log("sql", sql)
         pool.query(sql, (err, result) => {
             if(err) client.emit('addAppointment',{error: 1})
-            let obj = {error: 0, insertId: result.insertId, uid:data.uid, aWith: data.aWith, subject: data.subject, aWhen: data.aWhen}
+            const obj = {error: 0, insertId: result.insertId, uid:data.uid, aWith: data.aWith, subject: data.subject, aWhen: data.aWhen}
             // console.log(obj)
             client.emit('addAppointment', obj)
-            isNotNew(data.auid, 'addAppointment');
+            isNotNew(data.auid, 'addAppointment', obj);
         })
     })
 })
