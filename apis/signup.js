@@ -3,7 +3,7 @@ const signup = (req, res, pool) => {
     let sql = `SELECT EXISTS(SELECT * FROM users WHERE username='${req.body.username}') AS mycheck`;
     pool.query(sql, (err, result1) => {
         if(err) throw err
-        if(result1[0].mycheck === 1){
+        if(result1.rows[0].mycheck === 1){
             res.send({error: 1, msg: 'already exists'})
         } else {
             sql = `INSERT INTO USERS (username, password) VALUES ('${req.body.username}', '${req.body.password}')`
@@ -13,7 +13,7 @@ const signup = (req, res, pool) => {
                     res.send({error: 1, msg:'went wrong'})
                     throw err;
                 }
-                res.send({error: 0, msg:'user created', id: result2.insertId});
+                res.send({error: 0, msg:'user created', id: result2.rows.insertId});
             })
         }
     })

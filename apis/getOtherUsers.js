@@ -3,8 +3,8 @@ const getOtherUsers = (req, res, pool) => {
     console.log("get users", sql)
     pool.query(sql, (err, result) => {
         if(err) throw err;
-        // console.log(res)
-        res.send(result)
+        // console.log("otherusers", result)
+        res.send(result.rows)
     })
 }
 

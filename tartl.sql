@@ -31,16 +31,16 @@ SET time_zone = "+00:00";
 CREATE TABLE `appointments` (
   `aid` int(11) NOT NULL,
   `uid` int(11) NOT NULL,
-  `aWith` varchar(20) NOT NULL,
+  `awith` varchar(20) NOT NULL,
   `subject` varchar(20) NOT NULL,
-  `aWhen` datetime NOT NULL
+  `awhen` datetime NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=latin1;
 
 --
 -- Dumping data for table `appointments`
 --
 
-INSERT INTO `appointments` (`aid`, `uid`, `aWith`, `subject`, `aWhen`) VALUES
+INSERT INTO `appointments` (`aid`, `uid`, `awith`, `subject`, `awhen`) VALUES
 (1, 1, 'mukesh macha', 'dentist', '2019-12-19 01:30:00'),
 (2, 1, 'rahusdf', 'optho', '2019-12-27 04:30:00'),
 (9, 1, 'ajay', 'therapist', '2019-12-17 10:08:18'),
@@ -66,14 +66,14 @@ CREATE TABLE `reminders` (
   `uid` int(11) NOT NULL,
   `subject` varchar(100) NOT NULL,
   `description` varchar(5000) NOT NULL,
-  `rWhen` datetime NOT NULL
+  `rwhen` datetime NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=latin1;
 
 --
 -- Dumping data for table `reminders`
 --
 
-INSERT INTO `reminders` (`rid`, `uid`, `subject`, `description`, `rWhen`) VALUES
+INSERT INTO `reminders` (`rid`, `uid`, `subject`, `description`, `rwhen`) VALUES
 (2, 1, 'cnn', 'learn convoltion neural networks for ml', '2019-12-17 00:00:00'),
 (3, 1, 'aws doneda', 'learn hosting on aws', '2019-12-20 00:30:24'),
 (4, 1, 'consistent hashing asdasd', 'learn consistent hashing for system desing', '2019-12-16 12:00:00'),
