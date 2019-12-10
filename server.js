@@ -3,19 +3,11 @@ const bodyParser = require('body-parser');
 const cors = require('cors')
 app.use(bodyParser.urlencoded({ extended: true }));
 app.use(bodyParser.json());
-app.use(cors())
-app.use(function(req, res, next) {
-    res.header("Access-Control-Allow-Origin", "http://localhost:8000");
-    res.header("Access-Control-Allow-Headers", "X-Requested-With");
-    res.header("Access-Control-Allow-Headers", "Content-Type");
-    res.header("Access-Control-Allow-Methods", "PUT, GET, POST, DELETE, OPTIONS");
-    next();
-});
+
 require ('dotenv/config')
 const mysql = require('mysql')
 const server = app.listen(PORT = process.env.port || 8000, () => {console.log(`listening on ${PORT}`)})
 const io = require('socket.io').listen(server)
-// io.set('origins', 'http://localhost:8000');
 
 const { login } = require('./apis/login')
 const { signup } = require('./apis/signup')
@@ -23,6 +15,8 @@ const { getReminders } = require('./apis/getReminders')
 const { getAppointments } = require('./apis/getAppointments')
 const { editReminder } = require('./apis/editReminder')
 const { addReminder } = require('./apis/addReminder')
+const { getOtherUserDetails } = require('./apis/getOtherUserDetails')
+const { getOtherUsers } = require('./apis/getOtherUsers')
 
 const pool = mysql.createPool({
     host: process.env.PGHOST,
@@ -33,6 +27,15 @@ const pool = mysql.createPool({
 
 let activeConnections = {}
 
+const isNotNew = (auid, action) => {
+    console.log("auid", auid)
+    if(!auid){
+        if(activeConnections.hasOwnProperty(auid)){
+            activeConnections[auid].emit(action, obj)
+            console.log("notification sent")
+        }
+    }
+}
 
 io.on('connection', (client) =>{
     console.log(`connection id ${client.id}`)
@@ -45,6 +48,7 @@ io.on('connection', (client) =>{
         pool.query(sql, (err, result) => {
             if(err) throw err
             client.emit('editAppointment', {error: 0, subject: data.subject, aWhen: data.aWhen, aWith: data.aWith, aid: data.aid})
+            isNotNew(data.auid, 'editAppointment')
         })   
     });
 
@@ -56,23 +60,19 @@ io.on('connection', (client) =>{
             let obj = {error: 0, insertId: result.insertId, uid:data.uid, aWith: data.aWith, subject: data.subject, aWhen: data.aWhen}
             // console.log(obj)
             client.emit('addAppointment', obj)
+            isNotNew(data.auid, 'addAppointment');
         })
     })
 })
 
-app.get('/getUsers', (req, res) => {
-    let sql = `Select id, username from users`
-    pool.query(sql, (err, res) => {
-        if(err) throw err;
-        console.log(res)
-        res.send(res)
-    })
+app.post('/getUsers', (req, res) => {
+   getOtherUsers(req, res, pool)
 })
 
 app.post('/login', (req, res) => {
     login(req, res, pool)
 }) 
-//signup id
+
 app.post('/signup', (req, res) => {
     signup(req, res, pool)
 })
@@ -92,4 +92,8 @@ app.post('/editReminder', (req, res) => {
 
 app.post('/addReminder', (req, res) => {
     addReminder(req, res, pool)
+})
+
+app.post('/getOtherUsersDetails', (req, res) => {
+    getOtherUserDetails(req, res, pool)
 })
